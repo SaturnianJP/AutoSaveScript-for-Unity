@@ -8,8 +8,9 @@ namespace satania.runtime.autosave
 {   
     public class AutoSaveScript : EditorWindow
     {
-        #region public keys
-        private static readonly string autosaveKey = "satania@autosave@toggle";
+#if UNITY_EDITOR
+		#region public keys
+		private static readonly string autosaveKey = "satania@autosave@toggle";
 		private static readonly string intervalTimeKey = "satania@autosave@intervalTime";
         #endregion
 
@@ -239,5 +240,7 @@ namespace satania.runtime.autosave
 
 			EditorApplication.hierarchyChanged += UpdatehierarchyChanged;
 		}
-    }
+#endif
+	}
+
 }
