@@ -1,0 +1,14 @@
+{
+  "name": "satania.autosave.Editor",
+  "references": [
+    "satania.autosave"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "optionalUnityReferences": []
+}
