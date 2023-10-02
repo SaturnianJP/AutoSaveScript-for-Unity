@@ -1,14 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
+#endif
 using UnityEngine;
 
+
 namespace satania.runtime.autosave
-{   
-    public class AutoSaveScript : EditorWindow
-    {
+{
 #if UNITY_EDITOR
+	public class AutoSaveScript : EditorWindow
+    {
+
 		#region public keys
 		private static readonly string autosaveKey = "satania@autosave@toggle";
 		private static readonly string intervalTimeKey = "satania@autosave@intervalTime";
@@ -240,7 +245,7 @@ namespace satania.runtime.autosave
 
 			EditorApplication.hierarchyChanged += UpdatehierarchyChanged;
 		}
-#endif
-	}
 
+	}
+#endif
 }
