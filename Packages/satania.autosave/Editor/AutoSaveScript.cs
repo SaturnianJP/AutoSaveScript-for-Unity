@@ -199,10 +199,18 @@ namespace satania.runtime.autosave
 
         private void SaveScene()
         {
-            UnityEngine.SceneManagement.Scene _scene = EditorSceneManager.GetActiveScene();
-            bool saveOK = EditorSceneManager.SaveScene(_scene, _scene.path);
+            bool saved = true;
 
-            if (saveOK)
+            int sceneCount = EditorSceneManager.sceneCount;
+            for (int i = 0; i < sceneCount && sceneCount > 0; i++)
+            {
+                var scene = EditorSceneManager.GetSceneAt(i);
+                bool success = EditorSceneManager.SaveScene(scene, scene.path);
+                if (!success)
+                    saved = false;
+            }
+
+            if (saved)
                 ColorDebugLog("シーンを保存しました " + System.DateTime.Now, Color.green);
             else
                 ColorDebugLog("シーンの保存に失敗しました。 " + System.DateTime.Now, Color.red);
@@ -238,9 +246,7 @@ namespace satania.runtime.autosave
         private void UpdateLoop()
         {
             EditorApplication.playModeStateChanged += UpdatePlayModeState;
-
             EditorApplication.update += addUpdate;
-
             EditorApplication.hierarchyChanged += UpdatehierarchyChanged;
         }
 
