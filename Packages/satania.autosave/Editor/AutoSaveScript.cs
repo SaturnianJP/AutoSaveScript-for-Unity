@@ -7,7 +7,6 @@ namespace satania.runtime.autosave
     internal class AutoSaveSetting : ScriptableSingleton<AutoSaveSetting>
     {
         internal double nextTime = 0;
-        internal bool isChangedHierarchy = false;
     }
 
     public class AutoSaveScript : EditorWindow
@@ -205,6 +204,9 @@ namespace satania.runtime.autosave
             for (int i = 0; i < sceneCount && sceneCount > 0; i++)
             {
                 var scene = EditorSceneManager.GetSceneAt(i);
+                if (!scene.isDirty)
+                    continue;
+
                 bool success = EditorSceneManager.SaveScene(scene, scene.path);
                 if (!success)
                     saved = false;
@@ -226,28 +228,19 @@ namespace satania.runtime.autosave
 
         private void addUpdate()
         {
-            if (setting.isChangedHierarchy && EditorApplication.timeSinceStartup > setting.nextTime)
+            if (EditorApplication.timeSinceStartup > setting.nextTime)
             {
                 setting.nextTime = EditorApplication.timeSinceStartup + timeArray[intervalTime];
                 if (isAutoSave && !EditorApplication.isPlaying)
                 {
                     SaveScene();
                 }
-                setting.isChangedHierarchy = false;
             }
         }
-
-        private void UpdatehierarchyChanged()
-        {
-            if (!EditorApplication.isPlaying)
-                setting.isChangedHierarchy = true;
-        }
-
         private void UpdateLoop()
         {
             EditorApplication.playModeStateChanged += UpdatePlayModeState;
             EditorApplication.update += addUpdate;
-            EditorApplication.hierarchyChanged += UpdatehierarchyChanged;
         }
 
     }

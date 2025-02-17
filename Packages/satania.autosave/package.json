@@ -1,13 +1,13 @@
 {
   "name": "satania.autosave",
   "displayName": "Unity AutoSave",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Unity AutoSave",
   "gitDependencies": {},
   "vpmDependencies": {},
   "author": {
     "name": "satania",
-    "email": "saturnianpersonal@gmail.com",
+    "email": "osigoto@satania.net",
     "url": "https://saturnianshop.booth.pm/"
   },
   "legacyFolders": {},
