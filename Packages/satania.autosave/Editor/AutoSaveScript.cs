@@ -14,7 +14,7 @@ namespace satania.runtime.autosave
         private static readonly string autosaveKey = "satania@autosave@toggle";
         private static readonly string intervalTimeKey = "satania@autosave@intervalTime";
 
-        AutoSaveSetting setting => AutoSaveSetting.instance;
+        private static AutoSaveSetting setting => AutoSaveSetting.instance;
 
         #region methods
         /// <summary>
@@ -22,7 +22,7 @@ namespace satania.runtime.autosave
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool GetConfigBool(string key)
+        public static bool GetConfigBool(string key)
         {
             string value = EditorUserSettings.GetConfigValue(key);
             if (string.IsNullOrEmpty(value))
@@ -33,7 +33,7 @@ namespace satania.runtime.autosave
             return value.Equals("True");
         }
 
-        public int GetConfigInt(string key)
+        public static int GetConfigInt(string key)
         {
             string value = EditorUserSettings.GetConfigValue(key);
             if (string.IsNullOrEmpty(value))
@@ -41,28 +41,17 @@ namespace satania.runtime.autosave
                 return -1;
             }
 
-            int number = 0;
-            if (!int.TryParse(value, out number))
+            if (int.TryParse(value, out int number))
             {
-                return -1;
+                return number;
             }
 
-            return number;
-        }
-
-        public void SetConfigBool(string key, bool value)
-        {
-            EditorUserSettings.SetConfigValue(key, value.ToString());
-        }
-
-        public void SetConfigInt(string key, int value)
-        {
-            EditorUserSettings.SetConfigValue(key, value.ToString());
+            return -1;
         }
         #endregion
 
         #region defines
-        public bool isAutoSave
+        public static bool isAutoSave
         {
             get
             {
@@ -70,11 +59,11 @@ namespace satania.runtime.autosave
             }
             set
             {
-                SetConfigBool(autosaveKey, value);
+                EditorUserSettings.SetConfigValue(autosaveKey, value.ToString());
             }
         }
 
-        public int intervalTime
+        public static int intervalTime
         {
             get
             {
@@ -82,12 +71,12 @@ namespace satania.runtime.autosave
             }
             set
             {
-                SetConfigInt(intervalTimeKey, value);
+                EditorUserSettings.SetConfigValue(intervalTimeKey, value.ToString());
             }
         }
 
-        static string[] timeArrayText = { "1分", "5分", "15分", "30分", "60分" };
-        static int[] timeArray = { 60 * 1, 60 * 5, 60 * 15, 60 * 30, 60 * 60 };
+        private static string[] timeArrayText = { "1分", "5分", "15分", "30分", "60分" };
+        private static int[] timeArray = { 60 * 1, 60 * 5, 60 * 15, 60 * 30, 60 * 60 };
         #endregion
 
         #region editor functions
@@ -97,7 +86,7 @@ namespace satania.runtime.autosave
         /// <param name="msg">表示する内容</param>
         /// <param name="size">表示するサイズ</param>
         /// <param name="isBold">太字にするか</param>
-        private void DrawSizeLabel(string msg, int size, bool isBold = true, TextAnchor anchor = TextAnchor.MiddleLeft)
+        private static void DrawSizeLabel(string msg, int size, bool isBold = true, TextAnchor anchor = TextAnchor.MiddleLeft)
         {
             GUIStyle RichText = new GUIStyle(EditorStyles.label);
             RichText.richText = true;
@@ -109,7 +98,7 @@ namespace satania.runtime.autosave
                 GUILayout.Label($"<size={size}>{msg}</size>", RichText);
         }
 
-        void DrawLine(int i_height = 1, int padding = 5)
+        private static void DrawLine(int i_height = 1, int padding = 5)
         {
             GUILayout.Space(padding);
             Rect rect = EditorGUILayout.GetControlRect(false, i_height);
@@ -118,7 +107,7 @@ namespace satania.runtime.autosave
             GUILayout.Space(padding);
         }
 
-        private void ColorDebugLog(string msg, Color color)
+        private static void ColorDebugLog(string msg, Color color)
         {
             string colorStr = ColorUtility.ToHtmlStringRGBA(color);
             Debug.Log($"[<color=#{colorStr}>AuoSaveScript</color>]{msg}");
@@ -131,13 +120,13 @@ namespace satania.runtime.autosave
         public static string EditorTitle = "Unity自動セーブ";
 
         [MenuItem("さたにあしょっぴんぐ/Unity自動セーブ", priority = 30)]
-        private static void Init()
+        private static void OpenWindowByMenuItem()
         {
             //ウィンドウのインスタンスを生成
             AutoSaveScript window = GetWindow<AutoSaveScript>();
 
             //ウィンドウサイズを固定
-            window.maxSize = window.minSize = new Vector2(500, 300);
+            window.maxSize = window.minSize = new Vector2(400, 150);
 
             //タイトルを変更
             window.titleContent = new GUIContent(EditorTitle);
@@ -178,14 +167,14 @@ namespace satania.runtime.autosave
             string autosaveValue = EditorUserSettings.GetConfigValue(autosaveKey);
             if (string.IsNullOrEmpty(autosaveValue))
             {
-                SetConfigBool(autosaveKey, true);
+                EditorUserSettings.SetConfigValue(autosaveKey, true.ToString());
                 logFlag = true;
             }
 
             string intervalValue = EditorUserSettings.GetConfigValue(intervalTimeKey);
             if (string.IsNullOrEmpty(intervalValue))
             {
-                SetConfigInt(intervalTimeKey, 1);
+                EditorUserSettings.SetConfigValue(autosaveKey, "1");
                 logFlag = true;
             }
 
@@ -193,10 +182,16 @@ namespace satania.runtime.autosave
                 ColorDebugLog("設定を初期化しました。", Color.yellow);
 
             setting.nextTime = EditorApplication.timeSinceStartup + timeArray[intervalTime];
+            //UpdateLoop();
+        }
+
+        [InitializeOnLoadMethod]
+        private static void Init()
+        {
             UpdateLoop();
         }
 
-        private void SaveScene()
+        private static void SaveScene()
         {
             bool saved = true;
 
@@ -218,7 +213,7 @@ namespace satania.runtime.autosave
                 ColorDebugLog("シーンの保存に失敗しました。 " + System.DateTime.Now, Color.red);
         }
 
-        private void UpdatePlayModeState(PlayModeStateChange state)
+        private static void UpdatePlayModeState(PlayModeStateChange state)
         {
             if (isAutoSave && state == PlayModeStateChange.ExitingEditMode)
             {
@@ -226,7 +221,7 @@ namespace satania.runtime.autosave
             }
         }
 
-        private void addUpdate()
+        private static void _UpdateEvent()
         {
             if (EditorApplication.timeSinceStartup > setting.nextTime)
             {
@@ -237,10 +232,10 @@ namespace satania.runtime.autosave
                 }
             }
         }
-        private void UpdateLoop()
+        private static void UpdateLoop()
         {
             EditorApplication.playModeStateChanged += UpdatePlayModeState;
-            EditorApplication.update += addUpdate;
+            EditorApplication.update += _UpdateEvent;
         }
 
     }
