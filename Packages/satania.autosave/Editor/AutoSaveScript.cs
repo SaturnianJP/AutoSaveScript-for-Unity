@@ -38,7 +38,7 @@ namespace satania.runtime.autosave
             string value = EditorUserSettings.GetConfigValue(key);
             if (string.IsNullOrEmpty(value))
             {
-                return -1;
+                return 0;
             }
 
             if (int.TryParse(value, out int number))
@@ -46,7 +46,7 @@ namespace satania.runtime.autosave
                 return number;
             }
 
-            return -1;
+            return 0;
         }
         #endregion
 
